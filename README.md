@@ -1,4 +1,4 @@
-# RMCP - Routing & Memory Control Plane
+# RMCP Protocol
 
 [![Version](https://img.shields.io/badge/RMCP_Protocol-0.2.0--alpha-blue.svg)](https://github.com/rokoss21/rmcp-protocol)
 [![Engine](https://img.shields.io/badge/Prometheus_Engine-0.1.21--alpha-orange.svg)](https://github.com/rokoss21/rmcp-protocol)
