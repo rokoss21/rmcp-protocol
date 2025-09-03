@@ -1,0 +1,309 @@
+# Agent Registry Configuration for RMCP Meta-Orchestration
+# This file defines AI agents that can be used for strategic planning
+
+agent_registry:
+  - id: "agent-security-auditor"
+    name: "Security Auditor Agent"
+    description: "Autonomous agent for comprehensive security auditing of infrastructure code, including Terraform, Kubernetes manifests, and Docker configurations. Performs CIS benchmark compliance checks, vulnerability scanning, and automated remediation."
+    endpoint: "http://security-agent:8000/execute"
+    specialization: "security"
+    abstraction_level: "high"
+    max_complexity: 0.9
+    capabilities:
+      - "terraform_security_audit"
+      - "kubernetes_security_scan"
+      - "docker_security_analysis"
+      - "cis_benchmark_compliance"
+      - "vulnerability_assessment"
+      - "automated_remediation"
+    tags:
+      - "security"
+      - "compliance"
+      - "terraform"
+      - "kubernetes"
+      - "docker"
+    input_schema:
+      type: "object"
+      properties:
+        goal:
+          type: "string"
+          description: "High-level security goal (e.g., 'audit Terraform for CIS compliance')"
+        target_path:
+          type: "string"
+          description: "Path to the code to audit"
+        compliance_standard:
+          type: "string"
+          enum: ["cis", "nist", "pci", "sox"]
+          default: "cis"
+        auto_fix:
+          type: "boolean"
+          default: false
+          description: "Whether to automatically fix issues"
+      required: ["goal", "target_path"]
+    output_schema:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "partial", "failed"]
+        issues_found:
+          type: "integer"
+        issues_fixed:
+          type: "integer"
+        compliance_score:
+          type: "number"
+          minimum: 0
+          maximum: 100
+        report_path:
+          type: "string"
+        recommendations:
+          type: "array"
+          items:
+            type: "string"
+
+  - id: "agent-deployment-orchestrator"
+    name: "Deployment Orchestrator Agent"
+    description: "Intelligent agent for orchestrating complex deployment pipelines across multiple environments. Handles blue-green deployments, canary releases, rollbacks, and environment-specific configurations."
+    endpoint: "http://deployment-agent:8000/execute"
+    specialization: "deployment"
+    abstraction_level: "high"
+    max_complexity: 0.95
+    capabilities:
+      - "blue_green_deployment"
+      - "canary_releases"
+      - "automated_rollback"
+      - "environment_management"
+      - "configuration_management"
+      - "health_checking"
+      - "traffic_routing"
+    tags:
+      - "deployment"
+      - "devops"
+      - "kubernetes"
+      - "docker"
+      - "ci_cd"
+    input_schema:
+      type: "object"
+      properties:
+        goal:
+          type: "string"
+          description: "Deployment goal (e.g., 'deploy auth-v2 service to production')"
+        service_name:
+          type: "string"
+        target_environment:
+          type: "string"
+          enum: ["dev", "staging", "production"]
+        deployment_strategy:
+          type: "string"
+          enum: ["blue_green", "canary", "rolling", "recreate"]
+          default: "rolling"
+        image_tag:
+          type: "string"
+        health_check_timeout:
+          type: "integer"
+          default: 300
+      required: ["goal", "service_name", "target_environment"]
+    output_schema:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "failed", "rolled_back"]
+        deployment_id:
+          type: "string"
+        url:
+          type: "string"
+        health_status:
+          type: "string"
+        rollback_available:
+          type: "boolean"
+
+  - id: "agent-code-reviewer"
+    name: "Code Reviewer Agent"
+    description: "AI-powered code review agent that performs comprehensive code analysis, including style checking, security vulnerabilities, performance issues, and architectural compliance."
+    endpoint: "http://code-review-agent:8000/execute"
+    specialization: "code_quality"
+    abstraction_level: "medium"
+    max_complexity: 0.8
+    capabilities:
+      - "static_code_analysis"
+      - "security_vulnerability_detection"
+      - "performance_analysis"
+      - "architectural_compliance"
+      - "code_style_enforcement"
+      - "test_coverage_analysis"
+      - "dependency_audit"
+    tags:
+      - "code_review"
+      - "quality"
+      - "security"
+      - "performance"
+      - "architecture"
+    input_schema:
+      type: "object"
+      properties:
+        goal:
+          type: "string"
+          description: "Review goal (e.g., 'review PR #123 for security and performance issues')"
+        repository_path:
+          type: "string"
+        pull_request_id:
+          type: "string"
+        review_focus:
+          type: "array"
+          items:
+            type: "string"
+            enum: ["security", "performance", "style", "architecture", "tests"]
+          default: ["security", "performance"]
+        severity_threshold:
+          type: "string"
+          enum: ["low", "medium", "high", "critical"]
+          default: "medium"
+      required: ["goal", "repository_path"]
+    output_schema:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["approved", "changes_requested", "needs_attention"]
+        issues_found:
+          type: "integer"
+        critical_issues:
+          type: "integer"
+        review_summary:
+          type: "string"
+        recommendations:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              file:
+                type: "string"
+              line:
+                type: "integer"
+              severity:
+                type: "string"
+              message:
+                type: "string"
+              suggestion:
+                type: "string"
+
+  - id: "agent-test-automation"
+    name: "Test Automation Agent"
+    description: "Intelligent test automation agent that can generate, execute, and maintain test suites. Handles unit tests, integration tests, end-to-end tests, and performance testing."
+    endpoint: "http://test-automation-agent:8000/execute"
+    specialization: "testing"
+    abstraction_level: "medium"
+    max_complexity: 0.85
+    capabilities:
+      - "test_generation"
+      - "test_execution"
+      - "test_maintenance"
+      - "performance_testing"
+      - "integration_testing"
+      - "end_to_end_testing"
+      - "test_reporting"
+    tags:
+      - "testing"
+      - "automation"
+      - "quality_assurance"
+      - "ci_cd"
+    input_schema:
+      type: "object"
+      properties:
+        goal:
+          type: "string"
+          description: "Testing goal (e.g., 'generate and run tests for new authentication module')"
+        code_path:
+          type: "string"
+        test_types:
+          type: "array"
+          items:
+            type: "string"
+            enum: ["unit", "integration", "e2e", "performance"]
+          default: ["unit", "integration"]
+        framework_preference:
+          type: "string"
+          enum: ["pytest", "jest", "cypress", "selenium"]
+        coverage_threshold:
+          type: "number"
+          default: 80
+      required: ["goal", "code_path"]
+    output_schema:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "partial", "failed"]
+        tests_generated:
+          type: "integer"
+        tests_passed:
+          type: "integer"
+        tests_failed:
+          type: "integer"
+        coverage_percentage:
+          type: "number"
+        test_report_path:
+          type: "string"
+        execution_time_ms:
+          type: "integer"
+
+  - id: "agent-documentation-generator"
+    name: "Documentation Generator Agent"
+    description: "AI agent that automatically generates and maintains comprehensive documentation including API docs, user guides, architecture diagrams, and code comments."
+    endpoint: "http://docs-agent:8000/execute"
+    specialization: "documentation"
+    abstraction_level: "medium"
+    max_complexity: 0.7
+    capabilities:
+      - "api_documentation"
+      - "user_guides"
+      - "architecture_diagrams"
+      - "code_comments"
+      - "changelog_generation"
+      - "tutorial_creation"
+      - "documentation_maintenance"
+    tags:
+      - "documentation"
+      - "api"
+      - "user_experience"
+      - "maintenance"
+    input_schema:
+      type: "object"
+      properties:
+        goal:
+          type: "string"
+          description: "Documentation goal (e.g., 'generate API docs for new user service')"
+        source_path:
+          type: "string"
+        documentation_types:
+          type: "array"
+          items:
+            type: "string"
+            enum: ["api", "user_guide", "architecture", "tutorial", "changelog"]
+          default: ["api", "user_guide"]
+        output_format:
+          type: "string"
+          enum: ["markdown", "html", "pdf", "confluence"]
+          default: "markdown"
+        include_diagrams:
+          type: "boolean"
+          default: true
+      required: ["goal", "source_path"]
+    output_schema:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+          enum: ["success", "partial", "failed"]
+        documents_generated:
+          type: "integer"
+        output_path:
+          type: "string"
+        diagrams_created:
+          type: "integer"
+        word_count:
+          type: "integer"
+        last_updated:
+          type: "string"
+

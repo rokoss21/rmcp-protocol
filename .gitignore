@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# RMCP Specific
+*.db
+*.sqlite3
+rmcp.db
+data/
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Documentation and AI Instructions (keep only README.md and docs/TESTING.md)
+*.md
+!README.md
+!docs/TESTING.md
+
+# Exclude most docs files
+docs/*.md
+!docs/TESTING.md
+
+# AI assistant files
+CLAUDE.md
+.cursor/
+.cursorrules
+.ai-instructions/
+
+# System diagnosis and reports
+system_diagnosis_report_*.json
+test_report_*.md
+FINAL_ACHIEVEMENT_REPORT.md
+REAL_WORLD_TESTING_PLAN.md
+
+# Generated files
+generated_*.py
+*.html
+
+# Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment files
+.env.*
+!.env.example
+
+# Docker volumes
+docker-volumes/
+
+# Node.js (if any frontend is added later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# PyCharm
+.idea/
+
+# Security
+*.pem
+*.key
+*.crt

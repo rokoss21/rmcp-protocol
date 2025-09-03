@@ -1,0 +1,125 @@
+# Test Configuration for RMCP Meta-Orchestration
+# This configuration sets up RMCP with mock MCP server and agent for testing
+
+# Server configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  debug: true
+
+# Database configuration
+database:
+  path: "/app/data/rmcp_test.db"
+  init_on_startup: true
+
+# MCP Servers configuration
+mcp_servers:
+  - id: "mock-mcp-server"
+    name: "Mock MCP Server"
+    base_url: "http://mock-mcp-server:8000"
+    description: "Test MCP server with atomic tools"
+    status: "active"
+
+# Agent Registry configuration
+agent_registry:
+  - id: "test-agent-1"
+    name: "Security Auditor Agent"
+    description: "Autonomous agent for security auditing and vulnerability assessment"
+    endpoint: "http://mock-agent:8001/execute"
+    input_schema:
+      goal:
+        type: "string"
+        description: "The security audit goal"
+      context:
+        type: "object"
+        description: "Additional context for the audit"
+    output_schema:
+      status:
+        type: "string"
+        description: "Execution status"
+      summary:
+        type: "string"
+        description: "Summary of the audit"
+      data:
+        type: "object"
+        description: "Audit results and findings"
+    capabilities:
+      - "security_audit"
+      - "vulnerability_scan"
+      - "compliance_check"
+    tags:
+      - "security"
+      - "audit"
+      - "compliance"
+    specialization: "security"
+    abstraction_level: "high"
+    max_complexity: 1.0
+    success_rate: 0.95
+    avg_execution_time_ms: 30000
+    cost_per_execution: 0.1
+
+# Planning configuration
+planning:
+  # Strategic planning parameters
+  strategic_mode: true
+  agent_delegation_threshold: 0.8
+  strategic_complexity_threshold: 0.6
+  
+  # Compass stage parameters
+  compass:
+    max_candidates: 10
+    affinity_threshold: 0.3
+    
+  # Judge stage parameters
+  judge:
+    llm_model: "gpt-3.5-turbo"
+    max_tokens: 1000
+    temperature: 0.1
+
+# Execution configuration
+execution:
+  # Circuit breaker settings
+  circuit_breaker:
+    failure_threshold: 5
+    recovery_timeout: 60
+    success_threshold: 3
+    
+  # Timeout settings
+  timeouts:
+    default_tool_timeout_ms: 30000
+    agent_timeout_ms: 60000
+    max_execution_time_ms: 300000
+
+# Observability configuration
+observability:
+  # Metrics
+  metrics:
+    enabled: true
+    port: 9090
+    
+  # Logging
+  logging:
+    level: "INFO"
+    format: "json"
+    output: "stdout"
+    
+  # Telemetry
+  telemetry:
+    enabled: true
+    batch_size: 100
+    flush_interval_ms: 5000
+
+# Security configuration
+security:
+  # API key validation
+  api_keys:
+    enabled: false  # Disabled for testing
+    
+  # Rate limiting
+  rate_limiting:
+    enabled: false  # Disabled for testing
+    
+  # Approval workflow
+  approval:
+    enabled: false  # Disabled for testing
+

@@ -1,0 +1,66 @@
+# RMCP Configuration
+# Конфигурация для MVP версии
+
+# Настройки сервера
+server:
+  host: "0.0.0.0"
+  port: 8000
+  debug: true
+
+# База данных
+database:
+  path: "rmcp.db"
+  init_schema: true
+
+# MCP серверы для сканирования
+mcp_servers:
+  - base_url: "http://mcp-basic-tools:8001"
+    description: "Basic Tools MCP Server"
+  - base_url: "http://mcp-filesystem-write:8002"
+    description: "Filesystem Write MCP Server"
+  - base_url: "http://mcp-agent-wrapper:8003"
+    description: "Agent Wrapper MCP Server (Backend, Architect, etc.)"
+
+# LLM providers
+llm_providers:
+  mock:
+    api_key: "mock"
+    model: "mock-model"
+    max_tokens: 1000
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-3.5-turbo"
+    max_tokens: 1000
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-3-sonnet-20240229"
+    max_tokens: 1000
+
+# LLM role assignments
+llm_roles:
+  ingestor: "openai"
+  planner_judge: "openai"
+  result_merger: "openai"
+
+# Embeddings configuration
+embeddings:
+  provider: "openai"  # or "local" for sentence-transformers
+  model: "text-embedding-ada-002"  # OpenAI model
+  local_model: "all-MiniLM-L6-v2"  # Local model for sentence-transformers
+  dimension: 384  # Embedding dimension
+  cache_size: 1000  # Maximum cached embeddings
+
+# Настройки планировщика
+planner:
+  max_candidates: 50
+  top_k: 5
+  weights:
+    affinity: 0.6
+    success_rate: 0.3
+    latency: 0.1
+
+# Настройки телеметрии
+telemetry:
+  batch_size: 100
+  update_interval: 10  # секунд
+  max_affinity_embeddings: 10

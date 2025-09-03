@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  # Main RMCP Server (Brigade Orchestrator)
+  rmcp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RMCP_PORT=8000
+    volumes:
+      - ./rmcp:/app/rmcp
+      - ./autonomous_agents:/app/autonomous_agents
+    depends_on:
+      - architect
+      - backend
+      - tester
+      - validator
+      - devops
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Architect Agent
+  architect:
+    build: .
+    ports:
+      - "8003:8003"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LLM_ENDPOINT=http://localhost:11434
+      - LLM_MODEL=llama3.1
+    volumes:
+      - ./autonomous_agents:/app/autonomous_agents
+    command: ["python", "-m", "autonomous_agents.architect.main"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend Agent
+  backend:
+    build: .
+    ports:
+      - "8004:8004"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4o-mini
+    volumes:
+      - ./autonomous_agents:/app/autonomous_agents
+    command: ["python", "-m", "autonomous_agents.backend.main"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Tester Agent
+  tester:
+    build: .
+    ports:
+      - "8005:8005"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4o-mini
+    volumes:
+      - ./autonomous_agents:/app/autonomous_agents
+    command: ["python", "-m", "autonomous_agents.tester.main"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Validator Agent
+  validator:
+    build: .
+    ports:
+      - "8006:8006"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./autonomous_agents:/app/autonomous_agents
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["python", "-m", "autonomous_agents.validator.main"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # DevOps Agent
+  devops:
+    build: .
+    ports:
+      - "8008:8008"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4o-mini
+    volumes:
+      - ./autonomous_agents:/app/autonomous_agents
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["python", "-m", "autonomous_agents.devops.main"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local LLM Server (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    profiles:
+      - llm
+
+volumes:
+  ollama_data:
+
+networks:
+  default:
+    name: rmcp_brigade_network

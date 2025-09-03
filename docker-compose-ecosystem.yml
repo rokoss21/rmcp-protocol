@@ -1,0 +1,201 @@
+services:
+  # Main RMCP Server (Meta-Orchestrator)
+  rmcp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./rmcp.db
+      - LOG_LEVEL=INFO
+      - AGENT_TIMEOUT=30
+      - AGENT_MAX_RETRIES=3
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - RMCP_CONFIG_PATH=/app/rmcp/config.yaml
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - rmcp-network
+    depends_on:
+      - mcp-basic-tools
+      - mcp-filesystem-write
+      - mcp-agent-wrapper
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Basic Tools Server (Read-only operations)
+  mcp-basic-tools:
+    build: ./mcp_servers/basic_tools
+    ports:
+      - "8001:8001"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Filesystem Write Server (Write operations with security)
+  mcp-filesystem-write:
+    build: ./mcp_servers/filesystem_write
+    ports:
+      - "8002:8002"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Agent Wrapper Server (Wraps autonomous agents as MCP tools)
+  mcp-agent-wrapper:
+    build: ./mcp_servers/agent_wrapper
+    ports:
+      - "8003:8003"
+    environment:
+      - BACKEND_AGENT_URL=http://backend-agent:8005
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    networks:
+      - rmcp-network
+    depends_on:
+      - backend-agent
+      - architect-agent
+      - tester-agent
+      - devops-agent
+      - orchestrator-agent
+      - validator-agent
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend Agent (Code generation with LLM)
+  backend-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.backend.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8005)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8005:8005"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Architect Agent (System design with LLM)
+  architect-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.architect.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8006)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8006:8006"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Tester Agent (Test generation with LLM)
+  tester-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.tester.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8007)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8007:8007"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # DevOps Agent (Deployment configuration with LLM)
+  devops-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.devops.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8008)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8008:8008"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Orchestrator Agent (Workflow management with LLM)
+  orchestrator-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.orchestrator.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8009)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8009:8009"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Validator Agent (Code validation with LLM)
+  validator-agent:
+    build: .
+    command: ["python", "-c", "import sys; sys.path.append('/app'); from autonomous_agents.validator.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8010)"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    ports:
+      - "8010:8010"
+    networks:
+      - rmcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Mock Agent (from Phase 4/5)
+  agent-security-auditor:
+    build: .
+    command: ["python", "autonomous_agents/mock_agent.py"]
+    environment:
+      - AGENT_NAME=security-auditor
+      - AGENT_PORT=8004
+      - RMCP_URL=http://rmcp:8000
+    ports:
+      - "8004:8004"
+    networks:
+      - rmcp-network
+    depends_on:
+      - rmcp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  rmcp-network:
+    driver: bridge
+
+volumes:
+  rmcp-data:
+  rmcp-logs:
